@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>La mise au vert</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">La mise au vert</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#accueil">Accueil</a></li>
+          <li class="nav-item"><a class="nav-link" href="#apropos">À propos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="container">
+      <h1>Bienvenue à La mise au vert</h1>
+      <p>Un havre de paix pour vos compagnons à quatre pattes</p>
+    </div>
+  </header>
+
+  <!-- About Section -->
+  <section id="apropos" class="section section-light">
+    <div class="container">
+      <h2 class="section-title">À propos de nous</h2>
+      <p>Les pensions « La mise au vert » est un groupement de 11 pensions pour chiens et chats réparties sur le territoire de la France métropolitaine...</p>
+      <p>Depuis 1976, nous accueillons vos compagnons dans nos pensions pour chiens et chats dans un environnement agréable à la campagne. Nous sommes situés à proximité de Lille, Paris, Lyon, Orléans, Bordeaux, Dijon, Rennes, Reims, Clermont Ferrand, Millau, Amiens. Pour de court et long séjours, votre animal sera hébergé dans les meilleures conditions. Notre expérience est notre histoire, c’est avant tout le partage de notre passion...</p>
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#pensionsCollapse" aria-expanded="false" aria-controls="pensionsCollapse">
+        Voir les pensions
+      </button>
+      <div class="collapse" id="pensionsCollapse">
+        <div id="pensions-list" class="row">
+          <!-- Les pensions seront chargées ici dynamiquement -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="section">
+    <div class="container">
+      <h2 class="section-title">Nos Services</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <h3>Hôtel canin</h3>
+          <p>L'hôtel canin, c'est la solution confort pour votre chien ! Il pourra évoluer à sa convenance dans son espace intérieur et sa cour privative.</p>
+        </div>
+        <div class="col-md-4">
+          <h3>Camping canin</h3>
+          <p>Le camping canin se compose de niches individuelles et d'un grand jardin commun où vos chiens pourront se défouler à volonté.</p>
+        </div>
+        <div class="col-md-4">
+          <h3>Pension féline</h3>
+          <p>Nos espaces félins sont étudiés pour répondre aux besoins de nos amis chats. Ils bénéficient de calme et de tranquillité avec une ambiance musicale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section section-light">
+    <div class="container">
+      <h2 class="section-title">Contactez-nous</h2>
+      <div class="contact-info">
+        <h3>Informations de contact</h3>
+        <p>Pour toute question, veuillez nous contacter à l'adresse suivante :</p>
+        <p>Email: contact@lamiseauvert.fr</p>
+        <p>Téléphone: 03 20 00 11 22</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-4 bg-dark text-white text-center">
+    <div class="container">
+      <p class="mb-0">&copy; 2024 - La mise au vert. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { isAuthenticated, logout } from './js/auth.js';
+    import { updateAuthButton } from './js/header.js';
+    import config from './js/config.js';
+
+    // Rendre logout disponible globalement pour le bouton de déconnexion
+    window.logout = logout;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mettre à jour le bouton d'authentification
+      updateAuthButton();
+
+      // Charger les pensions
+      fetch(`${config.API_URL}/pension`)
+        .then(response => response.json())
+        .then(data => {
+          const pensionsList = document.getElementById('pensions-list');
+          data.forEach(pension => {
+            const pensionCard = document.createElement('div');
+            pensionCard.className = 'col-md-12';
+            pensionCard.innerHTML = `
+              <div class="service-card">
+                <div class="service-card-body">
+                  <h3><a href="pension.php?id=${pension.Id || pension.id}">${pension.Ville}</a></h3>
+                  <p>Adresse: ${pension.Adresse}</p>
+                  <p>Téléphone: ${pension.Telephone}</p>
+                  <p>Responsable: ${pension.Responsable}</p>
+                </div>
+              </div>
+            `;
+            pensionsList.appendChild(pensionCard);
+          });
+        })
+        .catch(error => console.error('Error fetching pensions:', error));
+    });
+  </script>
+</body>
+</html>

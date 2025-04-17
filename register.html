@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - La mise au vert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #2E7D32;
+        }
+        .btn-primary {
+            background-color: #2E7D32;
+            border-color: #2E7D32;
+        }
+        .btn-primary:hover {
+            background-color: #1B5E20;
+            border-color: #1B5E20;
+        }
+        .register-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .alert {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">La mise au vert</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Connexion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="register-container bg-white">
+            <h2 class="text-center mb-4">Inscription Propriétaire</h2>
+            <form id="registerForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="prenom" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="prenom" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="password" required minlength="6">
+                    <div class="form-text">Le mot de passe doit contenir au moins 6 caractères.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="telephone" class="form-label">Téléphone</label>
+                    <input type="tel" class="form-control" id="telephone" required>
+                </div>
+                <div class="mb-3">
+                    <label for="adresse" class="form-label">Adresse</label>
+                    <textarea class="form-control" id="adresse" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+                <div class="text-center mt-3">
+                    <p>Déjà inscrit ? <a href="login.html">Connectez-vous</a></p>
+                </div>
+            </form>
+            <div class="alert alert-danger" id="errorAlert" role="alert"></div>
+            <div class="alert alert-success" id="successAlert" role="alert"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import config from './js/config.js';
+        import { PROPRIETAIRE_ROUTES } from './js/proprietaire/proprietaire-config.js';
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+
+            const formData = {
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                telephone: document.getElementById('telephone').value,
+                adresse: document.getElementById('adresse').value
+            };
+
+            try {
+                const response = await fetch(`${config.API_URL}${PROPRIETAIRE_ROUTES.REGISTER}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erreur lors de l\'inscription');
+                }
+
+                successAlert.textContent = 'Inscription réussie ! Redirection vers la page de connexion...';
+                successAlert.style.display = 'block';
+                
+                // Rediriger vers la page de connexion après 2 secondes
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                errorAlert.textContent = error.message;
+                errorAlert.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - La mise au vert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #2E7D32;
+        }
+        .btn-primary {
+            background-color: #2E7D32;
+            border-color: #2E7D32;
+        }
+        .btn-primary:hover {
+            background-color: #1B5E20;
+            border-color: #1B5E20;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .alert {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">La mise au vert</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#apropos">À propos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="login-container">
+            <h2 class="text-center mb-4">Connexion</h2>
+            <div class="mb-4">
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="userType" id="adminType" value="admin" checked>
+                    <label class="btn btn-outline-primary" for="adminType">Administrateur</label>
+
+                    <input type="radio" class="btn-check" name="userType" id="proprietaireType" value="proprietaire">
+                    <label class="btn btn-outline-primary" for="proprietaireType">Propriétaire</label>
+                </div>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                <div class="text-center mt-3" id="registerLink" style="display: none;">
+                    <p>Pas encore de compte ? <a href="register.html">Inscrivez-vous</a></p>
+                </div>
+            </form>
+            <div class="alert alert-danger" id="errorAlert" role="alert"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { handleLoginFormSubmit } from './js/auth.js';
+        import { handleProprietaireLogin } from './js/proprietaire/proprietaire-auth.js';
+        import { updateAuthButton } from './js/header.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const userType = document.querySelector('input[name="userType"]:checked').value;
+                    
+                    if (userType === 'admin') {
+                        handleLoginFormSubmit(e);
+                    } else {
+                        handleProprietaireLogin(e);
+                    }
+                });
+
+                // Mettre à jour le titre en fonction du type sélectionné
+                const userTypeInputs = document.getElementsByName('userType');
+                userTypeInputs.forEach(input => {
+                    input.addEventListener('change', () => {
+                        const title = document.querySelector('h2');
+                        const registerLink = document.getElementById('registerLink');
+                        title.textContent = `Connexion ${input.value === 'admin' ? 'Administrateur' : 'Propriétaire'}`;
+                        registerLink.style.display = input.value === 'proprietaire' ? 'block' : 'none';
+                    });
+                });
+
+                // Initialiser l'affichage du lien d'inscription
+                document.getElementById('registerLink').style.display = 
+                    document.querySelector('input[name="userType"]:checked').value === 'proprietaire' ? 'block' : 'none';
+            }
+            updateAuthButton();
+        });
+    </script>
+</body>
+</html>

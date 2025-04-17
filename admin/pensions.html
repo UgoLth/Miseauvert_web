@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Pensions - La mise au vert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .navbar {
+            background-color: #2E7D32;
+        }
+        .btn-primary {
+            background-color: #2E7D32;
+            border-color: #2E7D32;
+        }
+        .btn-primary:hover {
+            background-color: #1B5E20;
+            border-color: #1B5E20;
+        }
+        .admin-header {
+            background-color: #E8F5E9;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        #alertContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">La mise au vert</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="pensions.html">Pensions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="proprietaires.html">Propriétaires</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- En-tête Admin -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1>Gestion des Pensions</h1>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" id="addPensionBtn">
+                        <i class="bi bi-plus-lg"></i> Ajouter une pension
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteneur pour les alertes -->
+    <div id="alertContainer"></div>
+
+    <!-- Liste des Pensions -->
+    <div class="container">
+        <div class="row" id="pensionsList">
+            <!-- Les pensions seront chargées ici dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une pension -->
+    <div class="modal fade" id="pensionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Ajouter une pension</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="pensionTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="infos-tab" data-bs-toggle="tab" data-bs-target="#infos" type="button" role="tab">Informations</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="gardiennage-tab" data-bs-toggle="tab" data-bs-target="#gardiennage" type="button" role="tab">Types de gardiennage</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="boxes-tab" data-bs-toggle="tab" data-bs-target="#boxes" type="button" role="tab">Boxes</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-3" id="pensionTabsContent">
+                        <!-- Onglet Informations -->
+                        <div class="tab-pane fade show active" id="infos" role="tabpanel">
+                            <form id="pensionForm">
+                                <div class="mb-3">
+                                    <label for="ville" class="form-label">Ville</label>
+                                    <input type="text" class="form-control" id="ville" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adresse" class="form-label">Adresse</label>
+                                    <input type="text" class="form-control" id="adresse" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telephone" class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="telephone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="responsable" class="form-label">Responsable</label>
+                                    <input type="text" class="form-control" id="responsable" required>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Onglet Types de gardiennage -->
+                        <div class="tab-pane fade" id="gardiennage" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type de gardiennage</th>
+                                            <th>Tarif (€)</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gardiennageList">
+                                        <!-- Les types de gardiennage seront chargés ici -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-success" id="addGardiennageBtn">
+                                <i class="bi bi-plus-lg"></i> Ajouter un tarif
+                            </button>
+                        </div>
+                        
+                        <!-- Onglet Boxes -->
+                        <div class="tab-pane fade" id="boxes" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Numéro</th>
+                                            <th>Superficie (m²)</th>
+                                            <th>Type</th>
+                                            <th>Disponibilité</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="boxesList">
+                                        <!-- Les boxes seront chargés ici -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-success" id="addBoxBtn">
+                                <i class="bi bi-plus-lg"></i> Ajouter un box
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="savePensionBtn">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un tarif -->
+    <div class="modal fade" id="gardiennageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un tarif</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="gardiennageForm">
+                        <div class="mb-3">
+                            <label for="typeGardiennage" class="form-label">Type de gardiennage</label>
+                            <select class="form-control" id="typeGardiennage" required>
+                                <!-- Les types seront chargés ici -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tarif" class="form-label">Tarif (€)</label>
+                            <input type="number" class="form-control" id="tarif" required min="0" step="0.01">
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un box -->
+    <div class="modal fade" id="boxModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un box</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="boxForm" onsubmit="saveBox(event)">
+                        <input type="hidden" id="boxId">
+                        <div class="mb-3">
+                            <label for="boxNumero" class="form-label">Numéro</label>
+                            <input type="text" class="form-control" id="boxNumero" maxlength="50" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boxTaille" class="form-label">Superficie (en m²)</label>
+                            <input type="text" class="form-control" id="boxTaille" maxlength="50" placeholder="Ex: 25" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="boxType" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="boxType" maxlength="50" placeholder="Ex: Standard, Luxe, etc." required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="boxDisponibilite" checked>
+                            <label class="form-check-label" for="boxDisponibilite">Disponible</label>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { isAuthenticated, logout } from '../js/auth.js';
+        import { updateAuthButton } from '../js/header.js';
+        
+        // Vérification de l'authentification
+        if (!isAuthenticated()) {
+            window.location.href = '../login.html';
+        }
+
+        // Rendre logout disponible globalement
+        window.logout = logout;
+        
+        // Mettre à jour le bouton d'authentification
+        document.addEventListener('DOMContentLoaded', updateAuthButton);
+    </script>
+    <script type="module" src="js/pensions.js"></script>
+</body>
+</html>
