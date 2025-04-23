@@ -1,5 +1,6 @@
 import config from '../../js/config.js';
 import { getAuthToken } from '../../js/auth.js';
+import { loadPensionCatalogue, populateCatalogueOptions, saveCatalogueOption } from './catalogue.js';
 
 // Variables globales
 let currentPensions = [];
@@ -119,8 +120,11 @@ async function editPension(id) {
         
         document.getElementById('modalTitle').textContent = 'Modifier la pension';
         
-        // Charger uniquement les types de gardiennage
+        // Charger les types de gardiennage pour cette pension
         await loadGardiennageTypes(id);
+        
+        // Charger le catalogue pour cette pension
+        await loadPensionCatalogue(id);
         
         const modal = new bootstrap.Modal(document.getElementById('pensionModal'));
         modal.show();
@@ -318,10 +322,32 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Gestionnaire pour le bouton d'ajout de box
     document.getElementById('addBoxBtn').addEventListener('click', () => {
-        editingBoxId = null;
+        document.querySelector('#boxModal .modal-title').textContent = 'Ajouter un box';
         document.getElementById('boxForm').reset();
+        document.getElementById('boxId').value = '';
         const modal = new bootstrap.Modal(document.getElementById('boxModal'));
         modal.show();
+    });
+
+    // Événement pour la soumission du formulaire de box
+    document.getElementById('boxForm').addEventListener('submit', saveBox);
+    
+    // Événement pour l'ajout d'une option du catalogue
+    document.getElementById('addCatalogueBtn').addEventListener('click', async () => {
+        document.querySelector('#catalogueModal .modal-title').textContent = 'Ajouter une option';
+        document.getElementById('catalogueForm').reset();
+        document.getElementById('catalogueOption').disabled = false;
+        
+        // Charger les options disponibles
+        await populateCatalogueOptions();
+        
+        const modal = new bootstrap.Modal(document.getElementById('catalogueModal'));
+        modal.show();
+    });
+    
+    // Événement pour la soumission du formulaire d'option du catalogue
+    document.getElementById('catalogueForm').addEventListener('submit', (event) => {
+        saveCatalogueOption(event, editingPensionId);
     });
     
     // Gestionnaire pour le formulaire de gardiennage
